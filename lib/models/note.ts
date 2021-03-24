@@ -30,7 +30,3 @@ Note.init(
     createdAt: false
   }
 );
-
-Note.belongsTo(User, {foreignKey: 'userId'});
-
-Note.sync({ force: false }).then(() => console.log("Node table created"));

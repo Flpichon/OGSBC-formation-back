@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Note, NoteInterface } from "../models/note";
+import { Note, NoteInterface } from "../models";
 import { UpdateOptions, DestroyOptions } from "sequelize";
 
 export class NotesController {
