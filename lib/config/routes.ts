@@ -20,6 +20,8 @@ export class Routes {
     app.route("/login").post(await this.userController.login);
     app.route("/logout").post(await this.userController.logout);
     app.route("/examen").get(await this.userController.getQcms);
+    app.route("/resultats").post(await this.userController.SaveResult);
+    app.route("/get_resultats").post(await this.userController.GetResult);
     // app.route("/").get(this.employeController.index);
 
     // app.route("/employes").get(this.employeController.index);

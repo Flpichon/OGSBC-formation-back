@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
-import { Qcm, Reponse, User, UserInterface } from "../models";
+import { Qcm, Reponse, Resultat, Resultat_Reponse, User, UserInterface } from "../models";
 import { Note, NoteInterface} from '../models';
 import { AuthToken, TokenInterface} from '../models/authToken';
-import { UpdateOptions, DestroyOptions } from "sequelize";
-import * as bcrypt from 'bcrypt';
+import { UpdateOptions, DestroyOptions, Op } from "sequelize";
+import * as bcrypt from 'bcrypt'
+import { RSA_NO_PADDING } from "constants";
 
 export class UsersController {
   public index(req: Request, res: Response) {
@@ -82,11 +83,8 @@ export class UsersController {
   }
 
   public async login(req: Request, res: Response) {
-    console.log("🚀 ~ file: user.controller.ts ~ line 85 ~ UsersController ~ login ~ req", req.body)
+    console.log('try to log');
     const { username, password } = req.body;
-
-    // if the username / password is missing, we use status code 400
-    // indicating a bad request was made and send back a message
     if (!username || !password) {
       return res.status(400).send(
         'Request missing username or password param'
@@ -97,9 +95,7 @@ export class UsersController {
 
       // we will cover the user authenticate method in the next section
       let user = await User.authenticate(username, password);
-      console.log("🚀 ~ file: user.controller.ts ~ line 100 ~ UsersController ~ login ~ user", user)
-      // res.cookie('auth_token', user.authToken);
-      // res.cookie('user', user.user);
+
       return res.json(user);
 
     } catch (err) {
@@ -128,6 +124,35 @@ export class UsersController {
     if (!!qcmsOk) {
       return res.json(qcmsOk);
     }
+  }
+
+  public async SaveResult(req: Request, res: Response) {
+    const reponseIds: any[] = req.body.ids;
+    const userId = req.body.userId;
+    const nbr = req.body.nbr;
+    const resultat = await Resultat.create({
+        userId,
+        nbr,
+        titre: 'Cybersecu' + Math.round(Math.random() * 20)
+    });
+    const data = reponseIds.map(id => {
+      return {
+        resultatId: resultat.resultatId,
+        reponseId: id
+      }
+    });
+    await Resultat_Reponse.bulkCreate(data);
+  }
+
+  public async GetResult(req: Request, res: Response) {
+    const userId = req.body.userId;
+    const resultats = await Resultat.findAll({
+      where: {
+        userId: userId
+      },
+      include: Reponse
+    });
+    return res.json(resultats);
   }
 
 }
